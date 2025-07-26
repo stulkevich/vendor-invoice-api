@@ -1,0 +1,77 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: {
+    typeName: 'Inbound Invoice',
+    typeNamePlural: 'Inbound Invoices',
+    title: { type: #STANDARD, value: 'MessageID' },
+    description: { value: 'DocumentDate' }
+  }
+}
+annotate entity ZC001_INVOICE
+    with 
+{
+  @UI.identification: [{type: #FOR_ACTION, dataAction: 'post', label: 'Post Inbound Invoice' }]
+
+  @UI.facet: [{ id: 'Header',
+      purpose: #STANDARD,
+      type: #IDENTIFICATION_REFERENCE,
+      position: 1,
+      label: 'Header' },
+      { id: 'Item',
+      purpose: #STANDARD,
+      type: #LINEITEM_REFERENCE,
+      position: 2,
+      label: 'Item',
+      targetElement: '_Item' } ]
+      
+    @EndUserText.label: 'Message ID'
+    @UI.lineItem: [{ position: 10 }]
+    @UI.identification: [{ position: 10 }]
+    MessageId;
+    
+    @EndUserText.label: 'Company Code'
+    @UI.lineItem: [{ position: 20 }]
+    @UI.identification: [{ position: 20 }]
+    CompanyCode;
+    
+    @EndUserText.label: 'Document Date'
+    @UI.lineItem: [{ position: 30 }]
+    @UI.identification: [{ position: 30 }]
+    DocumentDate;
+    
+    @EndUserText.label: 'Posting Date'
+    @UI.lineItem: [{ position: 40 }]
+    @UI.identification: [{ position: 40 }]
+    PostingDate;
+    
+    @EndUserText.label: 'Reference'
+    @UI.lineItem: [{ position: 50 }]
+    @UI.identification: [{ position:50 }]
+    ReferenceDocument;
+    
+    @EndUserText.label: 'Vendor'
+    @UI.lineItem: [{ position: 60 }]
+    @UI.identification: [{ position: 60 }]
+    Vendor;
+    
+    @EndUserText.label: 'CUR'
+    @UI.lineItem: [{ position: 70 }]
+    @UI.identification: [{ position: 70 }]
+    DocumentCurrency;
+    
+    @EndUserText.label: 'Amount'
+    @UI.lineItem: [{ position: 80 }]
+    @UI.identification: [{ position: 80 }]
+    InvoiceAmount;
+ 
+    @EndUserText.label: 'Status'
+    @UI.lineItem: [{ position: 90 }]
+    @UI.identification: [{ position: 90 }]
+    PostingStatus;
+    
+    @EndUserText.label: 'Message'
+    @UI.lineItem: [{ position: 100 }]
+    @UI.identification: [{ position: 100 }]
+    StatusMessage;
+    
+}

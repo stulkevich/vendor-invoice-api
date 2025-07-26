@@ -1,0 +1,5 @@
+@EndUserText.label: 'Inbound Invoice'
+define service Z001_INVOICE {
+  expose ZC001_INVOICE     as Invoice;
+  expose ZC001_INVOICE_ITM as InvoiceItem;
+}

@@ -1,0 +1,19 @@
+projection;
+//strict ( 2 );
+
+define behavior for ZC001_INVOICE alias Header
+{
+  use create;
+  use update;
+
+  use action post;
+
+  use association _Item { create; }
+}
+
+define behavior for ZC001_INVOICE_ITM alias Item
+{
+  use update;
+
+  use association _Header;
+}

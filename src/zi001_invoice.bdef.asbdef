@@ -1,0 +1,57 @@
+managed implementation in class zbp_i001_invoice unique;
+//strict ( 2 );  Authorization is switced off
+
+define behavior for ZI001_INVOICE alias Header
+persistent table Z001_INVOICE
+lock master
+early numbering
+{
+  field ( readonly )
+    MessageId,
+    PostingStatus,
+    StatusMessage;
+
+  create;
+  update;
+
+  determination PostingStatus on save { create; }
+
+  association _Item { create; }
+
+  action post result [1] $self;
+
+  mapping for Z001_INVOICE
+    {
+        MessageID         = message_id;
+        CompanyCode       = bukrs;
+        DocumentDate      = bldat;
+        PostingDate       = budat;
+        ReferenceDocument = xblnr;
+        Vendor            = lifnr;
+        DocumentCurrency  = waers;
+        InvoiceAmount     = rmwwr;
+        PostingStatus     = status;
+        StatusMessage     = status_message;
+    }
+}
+
+
+define behavior for ZI001_INVOICE_ITM alias Item
+persistent table Z001_INVOICE_ITM
+lock dependent by _Header
+early numbering
+{
+  field ( readonly ) MessageId, ItemID;
+  update;
+
+  association _Header;
+
+  mapping for Z001_INVOICE_ITM
+    {
+    MessageID         = message_id;
+    ItemID            = buzei;
+    PurchaseOrder     = ebeln;
+    PurchaseOrderItem = ebelp;
+    ItemAmount        = wrbtr;
+    }
+}

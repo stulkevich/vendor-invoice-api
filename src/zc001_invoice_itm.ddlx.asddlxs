@@ -1,0 +1,49 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: {
+    typeName: 'Inbound Invoice Item',
+    typeNamePlural: 'Inbound Invoice Items',
+    title: { type: #STANDARD, value: 'ItemID' },
+    description: { value: 'ItemAmount' }
+  }
+}
+annotate entity ZC001_INVOICE_ITM
+    with 
+{
+    @UI.facet: [{ id: 'Header',
+      purpose: #STANDARD,
+      type: #IDENTIFICATION_REFERENCE,
+      position: 1,
+      label: 'MessageID' } ]
+
+    @EndUserText.label: 'Message ID'
+    @UI.lineItem: [{ position: 5 }]
+    @UI.identification: [{ position: 5 }]
+    MessageID;
+
+    @EndUserText.label: 'Item ID'
+    @UI.lineItem: [{ position: 10 }]
+    @UI.identification: [{ position: 10 }]
+    ItemID;
+
+    @EndUserText.label: 'PO ID'
+    @UI.lineItem: [{ position: 20 }]
+    @UI.identification: [{ position: 20 }]
+    PurchaseOrder;
+
+    @EndUserText.label: 'PO Item ID'
+    @UI.lineItem: [{ position: 30 }]
+    @UI.identification: [{ position: 30 }]
+    PurchaseOrderItem;
+
+    @EndUserText.label: 'CUR'
+    @UI.lineItem: [{ position: 40 }]
+    @UI.identification: [{ position: 40 }]
+    DocumentCurrency;
+
+    @EndUserText.label: 'Amount'
+    @UI.lineItem: [{ position: 50 }]
+    @UI.identification: [{ position: 50 }]
+    ItemAmount;
+    
+}
