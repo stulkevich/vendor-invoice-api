@@ -143,32 +143,32 @@ CLASS lhc_Header IMPLEMENTATION.
 
   METHOD earlynumbering_create.
     DATA:
-      entity           TYPE STRUCTURE FOR CREATE zi001_invoice.
+      ls_entity           TYPE STRUCTURE FOR CREATE zi001_invoice.
 
-    LOOP AT entities INTO entity.
+    LOOP AT entities INTO ls_entity.
       TRY.
-          entity-MessageId = cl_uuid_factory=>create_system_uuid( )->create_uuid_c32( ).
+          ls_entity-MessageId = cl_uuid_factory=>create_system_uuid( )->create_uuid_c32( ).
           APPEND VALUE #(
-            %cid      = entity-%cid
-            %key      = entity-%key ) TO mapped-header.
+            %cid      = ls_entity-%cid
+            %key      = ls_entity-%key ) TO mapped-header.
         CATCH cx_uuid_error.
           APPEND VALUE #(
-            %cid      = entity-%cid
-            %key      = entity-%key ) TO failed-header.
+            %cid      = ls_entity-%cid
+            %key      = ls_entity-%key ) TO failed-header.
       ENDTRY.
     ENDLOOP.
   ENDMETHOD.
 
   METHOD earlynumbering_cba_Item.
     DATA:
-      entity  TYPE STRUCTURE FOR CREATE zi001_invoice\\Header\_Item,
-      counter TYPE i.
+      ls_entity  TYPE STRUCTURE FOR CREATE zi001_invoice\\Header\_Item,
+      lv_counter TYPE i.
 
-    LOOP AT entities INTO entity.
-      DATA(lt_items) = entity-%target.
+    LOOP AT entities INTO ls_entity.
+      DATA(lt_items) = ls_entity-%target.
       LOOP AT lt_items ASSIGNING FIELD-SYMBOL(<ls_item>).
-        counter += 1.
-        <ls_item>-ItemID = counter.
+        lv_counter += 1.
+        <ls_item>-ItemID = lv_counter.
         APPEND CORRESPONDING #( <ls_item> ) TO mapped-item.
       ENDLOOP.
     ENDLOOP.
@@ -224,6 +224,46 @@ CLASS lhc_Header IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD PostingStatus.
+    DATA:
+      lt_reported_upd TYPE TABLE FOR UPDATE zi001_invoice,
+      ls_header       TYPE lcl_invoice_processing=>sts_invoice_header,
+      lt_items        TYPE lcl_invoice_processing=>stt_invoice_item.
+
+    READ ENTITIES OF zi001_invoice IN LOCAL MODE
+      ENTITY header
+      ALL FIELDS WITH
+      CORRESPONDING #( keys )
+      RESULT DATA(headers).
+    ASSIGN headers[ 1 ] TO FIELD-SYMBOL(<ls_header>).
+    IF sy-subrc = 0.
+      ls_header = CORRESPONDING #( <ls_header> ).
+    ENDIF.
+
+    READ ENTITIES OF zi001_invoice IN LOCAL MODE
+      ENTITY item
+      ALL FIELDS WITH
+      CORRESPONDING #( keys )
+      RESULT DATA(items).
+    lt_items = CORRESPONDING #( items ).
+
+
+    DATA(ls_result) = lcl_invoice_processing=>post_invoice_mock(
+      is_invoice_header = ls_header
+      it_invoice_item   = lt_items ).
+
+    MODIFY ENTITIES OF zi001_invoice IN LOCAL MODE
+      ENTITY header
+      UPDATE FIELDS ( PostingStatus StatusMessage )
+      WITH VALUE #( FOR key IN keys
+        ( %tky = key-%tky
+          PostingStatus = ls_result-PostingStatus
+          StatusMessage = ls_result-StatusMessage
+          %control = VALUE #(
+            PostingStatus = if_abap_behv=>mk-on
+            StatusMessage = if_abap_behv=>mk-on ) ) )
+      REPORTED DATA(reported_upd).
+
+    reported = CORRESPONDING #( DEEP reported_upd ).
   ENDMETHOD.
 
 ENDCLASS.
